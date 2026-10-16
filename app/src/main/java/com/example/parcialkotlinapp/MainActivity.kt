@@ -2,12 +2,15 @@ package com.example.parcialkotlinapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.parcialkotlinapp.utils.FechaUtils
+import com.example.parcialkotlinapp.utils.aplicarInsetsSistema
+import com.google.android.material.appbar.MaterialToolbar
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -19,52 +22,43 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        val tvSaludo =findViewById<TextView>(R.id.tvSaludo)
+        findViewById<View>(R.id.main).aplicarInsetsSistema()
 
         // Nombre recibido desde LoginActivity
-        val  nombreUsuario = intent.getStringExtra(
-            "nombreUsuario"
-        ) ?: "Usuario"
+        val nombreUsuario = intent.getStringExtra("nombreUsuario")
 
-        //Hora Actual del dispositivo
+        // Sin usuario autenticado no se puede estar en esta pantalla
+        if (nombreUsuario.isNullOrBlank()) {
+            irAlLogin()
+            return
+        }
+
+        // =====================================
+        // SALUDO SEGÚN LA HORA DEL DISPOSITIVO
+        // =====================================
+
+        val tvSaludo = findViewById<TextView>(R.id.tvSaludo)
+
         val horaActual =
             Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
-        //Determinar saludo
-        var saludo = when(horaActual){
-
-            in 5..11 ->
-                "Buenos días"
-
-            in 12..17 ->
-                "Buenas tardes"
-
-            else ->
-                "Buenas noches"
-        }
-
-        //Mostrar saludo personalizado
+        val saludo = FechaUtils.obtenerSaludo(horaActual)
 
         tvSaludo.text = "$saludo, $nombreUsuario"
 
-        // Manejo de los bordes de la pantalla
-        ViewCompat.setOnApplyWindowInsetsListener(
-            findViewById(R.id.main)
-        ) { v, insets ->
+        // =====================================
+        // CERRAR SESIÓN (ícono superior)
+        // =====================================
 
-            val systemBars =
-                insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                )
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbarMain)
 
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-
-            insets
+        toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.action_cerrar_sesion) {
+                confirmarCierreSesion()
+                true
+            } else {
+                false
+            }
         }
 
         // =====================================
@@ -83,23 +77,28 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
+    }
 
-        // =====================================
-        // VOLVER AL LOGIN
-        // =====================================
+    private fun confirmarCierreSesion() {
+        AlertDialog.Builder(this)
+            .setTitle("Cerrar sesión")
+            .setMessage("¿Está seguro de que desea cerrar sesión?")
+            .setNegativeButton("CANCELAR", null)
+            .setPositiveButton("SALIR") { _, _ ->
+                irAlLogin()
+            }
+            .show()
+    }
 
-        val btnVolver2 =
-            findViewById<Button>(R.id.btnVolver2)
+    // Limpia la pila para que Atrás no regrese a la sesión anterior
+    private fun irAlLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
 
-        btnVolver2.setOnClickListener {
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 
-            val intent = Intent(
-                this,
-                LoginActivity::class.java
-            )
+        startActivity(intent)
 
-            startActivity(intent)
-        }
-
+        finish()
     }
 }

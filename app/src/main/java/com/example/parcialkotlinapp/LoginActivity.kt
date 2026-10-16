@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.parcialkotlinapp.api.ApiClient
+import com.example.parcialkotlinapp.api.ApiError
 import com.example.parcialkotlinapp.models.LoginRequest
 import com.example.parcialkotlinapp.models.Usuario
 import retrofit2.Call
@@ -133,18 +134,17 @@ class LoginActivity : AppCompatActivity() {
                                     "No se pudo obtener la información del usuario"
                             }
                         }
-                        // CREDENCIALES INCORRECTAS
-                        else if (response.code() == 401) {
-
-                            tvMensaje.text =
-                                "Correo o contraseña incorrectos"
-
-                        }
-                        // OTRO ERROR DEL BACKEND
+                        // CREDENCIALES INCORRECTAS (401) U OTRO ERROR
                         else {
 
+                            val porDefecto =
+                                if (response.code() == 401)
+                                    "Correo o contraseña incorrectos"
+                                else
+                                    "Error del servidor: ${response.code()}"
+
                             tvMensaje.text =
-                                "Error del servidor: ${response.code()}"
+                                ApiError.obtenerMensaje(response, porDefecto)
                         }
                     }
 
