@@ -2,6 +2,8 @@
 
 Aplicación móvil desarrollada en Kotlin para Android que consume una API REST desarrollada con ASP.NET Core.
 
+> **Versión 1 (v1):** primera versión funcional de la actividad. Aún faltan algunos detalles por ajustar.
+
 ## Tecnologías
 
 - Kotlin
@@ -44,6 +46,42 @@ ASP.NET Core REST API
     v
 MySQL
 ```
+
+API que consume esta app: [UserManagement-API-DotNet-Actividad](https://github.com/Santtiag0/UserManagement-API-DotNet-Actividad)
+
+## Instalación y ejecución
+
+### Requisitos
+- Android Studio (incluye el SDK de Android y el emulador)
+- El API .NET ejecutándose (ver el README del repositorio del API)
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/Santtiag0/UserManagement-Android-Kotlin-Actividad.git
+```
+
+### 2. Abrir en Android Studio
+- **File → Open** y seleccionar la carpeta del proyecto.
+- Esperar a que termine la sincronización de Gradle.
+
+### 3. Verificar la URL del API
+En `app/src/main/java/com/example/parcialkotlinapp/api/ApiClient.kt`:
+```kotlin
+private const val BASE_URL = "http://10.0.2.2:62129/"
+```
+- **Emulador:** dejarla así (`10.0.2.2` es el PC desde el emulador).
+- **Celular físico:** cambiar `10.0.2.2` por la IP del PC en la red (el celular y el PC deben estar en la misma red).
+
+### 4. Ejecutar
+1. Iniciar el API (`dotnet run` en el proyecto del API).
+2. En Android Studio crear o iniciar un emulador (Device Manager) y presionar **Run**.
+
+### 5. Probar el flujo
+1. **Crear cuenta** → llenar el formulario, elegir la fecha en el DatePicker y el semestre → **REGISTRAR**.
+2. Registrar de nuevo el mismo correo para ver el mensaje "Ya existe un usuario con ese correo."
+3. Iniciar sesión → aparece el saludo según la hora.
+4. Abrir **Ejercicio Par o Impar** y regresar con la flecha.
+5. Cerrar sesión con el ícono superior derecho → **SALIR**.
 
 ## Cambios realizados (actividad de modificación)
 
